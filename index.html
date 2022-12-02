@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="style.css">
+
+    <script src="script-img.js" defer></script>
+    <script src="script-csv.js" defer></script>
+    <script src="script-geo-data.js" defer></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.js"></script>
+
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+    integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM="
+    crossorigin=""></script>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+    integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI="
+    crossorigin=""/>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;500&family=Roboto:wght@100;300;400;700;900&family=Sono&display=swap" rel="stylesheet"> 
+
+    <title>🛰️</title>
+</head>
+<header>
+    <img src="" id="homer" width="250px">
+</header>
+<body>
+<section>
+<div class="chart"><canvas id="myChart"></canvas> </div>
+    
+
+<div class="iss"> 
+    <div class="iss-title">
+        <h1>ISS realtime position: </h1>
+    <ul>
+        <li>lat: <span id="lat"></span>°</li>
+        <li>lon: <span id="lon"></span>°</li>
+   </ul>
+    </div>   
+    
+      
+   <div id="map"></div>
+</div>
+
+</section>
+</body>
+
+<script>
+//https://leafletjs.com/examples/quick-start/ //website
+
+    const api_url = 'https://api.wheretheiss.at/v1/satellites/25544'
+
+    const map = L.map('map').setView([0, 0],5)
+        const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(map)
+
+        const myIcon = L.icon({
+        iconUrl: 'satellite.svg',
+        iconSize: [38, 95],
+        iconAnchor: [25, 16]
+        })
+        
+        const marker = L.marker([0, 0],{icon: myIcon} ).addTo(map)
+
+    async function getGeoData(){
+        const response = await fetch(api_url)
+        const parsedData = await response.json()
+        const { latitude, longitude } = parsedData
+
+        const lat = document.getElementById('lat')
+        const lon = document.getElementById('lon')
+    
+        lat.innerText = latitude
+        lon.innerText = longitude
+
+        marker.setLatLng([latitude,longitude])
+
+        map.setView([latitude,longitude])
+        
+    
+        // return { latitude, longitude }
+    }
+    
+    // getGeoData().then(data => console.log(data.latitude,data.longitude)) //showing the data
+    
+    getGeoData()
+
+    setInterval(getGeoData, 1000)
+     
+</script>
+
+</html>
